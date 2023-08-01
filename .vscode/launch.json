@@ -9,11 +9,13 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net7.0/Battleship-net.dll",
+            "program": "${workspaceFolder}/battleship-net/bin/Debug/net7.0/Battleship-net.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "stopAtEntry": false
+            "stopAtEntry": false,
+            "internalConsoleOptions": "neverOpen"
+
         },
         {
             "name": ".NET Core Attach",

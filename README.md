@@ -16,15 +16,16 @@ You can follow the progress from start to finish of this project on my live stre
 
 ### 2. Render Ships (2023-08-01)
 
-1. Fix Validation bug
-    1. Unit tests
-1. Render ships
-1. Add ship orientation
-1. Refactor
+1. ~~Fix Validation bug~~
+    1. ~~Unit tests~~
+1. ~~Render ships~~
+1. ~~Add ship orientation~~
+1. ~~Refactor~~ Extract renderer
 
 ### 3. Better inputs (2023-08-15)
 
 1. Updated Input controls
+    1. Arrows + tab
 1. Add Player(s)
 
 ### 4. Game play (2023-08-22)

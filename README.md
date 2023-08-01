@@ -14,13 +14,14 @@ You can follow the progress from start to finish of this project on my live stre
 1. ~~Render the board~~
 1. ~~Validate user input~~
 
-### 2. Render Ships (2023-08-01)
+### 2. ~~Render Ships~~ (2023-08-01) https://www.youtube.com/live/uDqFPOCAAME
 
 1. ~~Fix Validation bug~~
     1. ~~Unit tests~~
 1. ~~Render ships~~
 1. ~~Add ship orientation~~
-1. ~~Refactor~~ Extract renderer
+1. ~~Refactor~~ 
+    1. ~~Extract renderer~~
 
 ### 3. Better inputs (2023-08-15)
 

@@ -36,5 +36,5 @@ You can follow the progress from start to finish of this project on my live stre
 1. _Move ships_
 1. _Armours_
 1. _Blast radius_
-1. _Stronger misiles_
+1. _Different strength missiles_
 1. _Online_

@@ -1,50 +1,65 @@
 namespace battleship_net {
     public class Renderer {
 
-        public void RenderBoard(int width, int height)
+        private int _width;
+        private int _height;
+        private int _promptY;
+
+        public Renderer(int width, int height)
         {
-            Console.Write(" ");
+            _width =width;
+            _height = height;
 
-            for (var i = 0; i < width; i++)
-            {
-                var c = (int)'A' + i;
-                Console.Write($"|{(char)c}");
-            }
+            _promptY = height + 5;
+        }
+        public void RefreshBoard(Coordinate offset, IEnumerable<(Ship Ship, Position Pos)> ships ){
+            RenderBoard(offset);
 
-            Console.WriteLine("|");
-            Console.Write(" ");
-            
-            for (var i = 0; i < width; i++)
-            {
-                Console.Write("--");
-            }
-
-            Console.WriteLine();
-            for (var i = 0; i < height; i++)
-            {
-                Console.Write($"{i}");
-                for (var j = 0; j < width; j++)
-                {
-                    Console.Write("|_");
-                }
-                Console.WriteLine("|");
+            foreach(var ship in ships){
+                RenderShip(ship.Ship, ship.Pos);
             }
         }
-        public void RenderShip(Ship ship, string coordinate) 
+
+        public void RenderBoard(Coordinate offset)
         {
+            Console.SetCursorPosition(offset.X, offset.Y);
+            for (int i=0; i< _height; i++)
+            {
+                RenderCellRow(i, offset);
+            }
+            RenderHeaderRow(offset);
+        }
+
+        private void RenderHeaderRow(Coordinate offset){
+            var cells = Enumerable.Range('a', _width).Select(c => (char)c);
+            var row = string.Join(' ', cells);
+            var yOffset = offset.Y + _height;
+            Console.SetCursorPosition(offset.X+3, yOffset);
+            Console.Write($"{row}");
+        }
+
+        private void RenderCellRow(int rowNumber, Coordinate offset){
+            var cells = Enumerable.Repeat('_', _width);
+            var row = string.Join('|', cells);
+            Console.SetCursorPosition(offset.X, offset.Y + rowNumber);
+            Console.Write($"{rowNumber} |{row}|");
+        }
+
+        public void RenderShip(Ship ship, Position position) 
+        {
+            //ToDo.. Look to tidy this up, using board offsets.
             const int headerRows = 4;
             const int headerCols = 2;
 
-            var location = Program.ParseCoordinates(coordinate);
-            var cellX = headerCols + (location.col *2);
-            var cellY = headerRows + location.row;
+            var cellX = headerCols + (position.Col *2);
+            var cellY = headerRows + position.Row;
 
             Console.BackgroundColor = ConsoleColor.DarkGreen;
             Console.ForegroundColor = ConsoleColor.White;
 
             for(int i= 0; i < ship.size; i++) {
 
-                if (location.orientation == Orientation.Vertical) {
+                if (position.Orientation == Orientation.Vertical) {
                     Console.SetCursorPosition(cellX, cellY+i);
                 }
                 else{ 
@@ -59,9 +74,9 @@ namespace battleship_net {
         public void RenderPrompt(string message)
         {
             Console.ResetColor();
-            Console.SetCursorPosition(0, 15);
+            Console.SetCursorPosition(0, _promptY);
             Console.Write(message.PadRight(80));
-            Console.SetCursorPosition(message.Length +1, 15);
+            Console.SetCursorPosition(message.Length + 1, _promptY);
         }
     }
 }

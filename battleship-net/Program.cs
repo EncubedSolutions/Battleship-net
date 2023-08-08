@@ -1,19 +1,20 @@
-﻿using System.Text.RegularExpressions;
-namespace battleship_net 
+﻿namespace battleship_net 
 {
 public class Program
 {
     private static void Main(string[] args)
     {
-        var renderer = new Renderer();
         const int width = 10;
         const int height = 10;
+        Coordinate boardOffset= new Coordinate(0,3);
+        var renderer = new Renderer(width, height);
+        var inputs = new InputHandler();
 
         Console.Clear();
         Console.WriteLine("Hello, Battleship.net!");
         Console.WriteLine();
 
-        renderer.RenderBoard(width, height);
+        renderer.RenderBoard(boardOffset);
 
         List<Ship> ships = new List<Ship>{
                 new Ship("Carrier", 5),
@@ -23,55 +24,46 @@ public class Program
                 new Ship("Cruiser", 2),
             };
 
+        List<(Ship, Position)> placed = new List<(Ship, Position)>();
+
         foreach(var ship in ships) {
             var valid = false;
-            string coordinate = null;
-            while (!valid){
-                renderer.RenderPrompt($"Please enter location for {ship.Name}: ");
-                coordinate = Console.ReadLine();
-                valid = ValidateCoordinates(coordinate, ship);
+            Position pos = new Position(0,0,Orientation.Vertical);
+            renderer.RenderPrompt($"Please enter location for {ship.Name}: ");
+
+            //GetInput
+            while (true) {
+                renderer.RefreshBoard(boardOffset,placed);
+                var (command, data) = inputs.GetInput();
+                pos = GetPosition(pos, command, data);
+                //Validate Pos
+                renderer.RenderShip(ship, pos);
+                if(command == InputCommand.Accept) {
+                    placed.Add(new (ship, pos));
+                    break;
+                }
             }
-            renderer.RenderShip(ship, coordinate);
         }
     }
 
-    public static bool ValidateCoordinates(string value, Ship ship){
-        
-        var expression = "^[H,V][A-J][0-9]$";
-        const int boardSize = 10;
-
-        if (!Regex.IsMatch(value, expression, RegexOptions.IgnoreCase)) {
-                return false;
-        }
-
-        var coordinates = ParseCoordinates(value);
-
-        if (coordinates.orientation == Orientation.Vertical) {
-            if (coordinates.row + ship.size > boardSize) {
-                return false;
-            }
-        } else {
-            if (coordinates.col + ship.size > boardSize) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public static (int row, int col, Orientation orientation) ParseCoordinates(string value){
-        var v = value.ToUpper();
-        var orientation = v[0] == 'H' ? Orientation.Horizontal : Orientation.Vertical;
-        var col = (int)(v[1] - 'A');
-        var row = int.Parse(v[2].ToString());
-        
-        return (row, col, orientation);
-    }
-
+    private static Position GetPosition(Position prev, InputCommand command, int? data)=>
+     command switch{
+              InputCommand.MoveUp => prev with { Row = prev.Row - 1},  
+              InputCommand.MoveDown => prev with { Row = prev.Row + 1},
+              InputCommand.MoveLeft => prev with {Col = prev.Col -1},
+              InputCommand.MoveRight => prev with {Col = prev.Col +1},
+              //InputCommand.Rotate => prev with {Orientation = Orientation == Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal},
+              InputCommand.SelectCol => prev with { Col = data.Value},
+              InputCommand.SelectRow => prev with { Row = data.Value},
+              _ => prev
+            };
     
 }
 
+public record Coordinate(int X, int Y);
+public record Position(int Col, int Row, Orientation Orientation);
 public record Ship (string Name, int size);
 
 public enum Orientation { Horizontal, Vertical};
+
 }

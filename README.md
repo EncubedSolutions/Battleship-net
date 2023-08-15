@@ -23,20 +23,23 @@ You can follow the progress from start to finish of this project on my live stre
 1. ~~Refactor~~ 
     1. ~~Extract renderer~~
 
-### 3. Better inputs (2023-08-15) https://www.youtube.com/live/viisNBr_KpU
+### 3. Better inputs (2023-08-8) https://www.youtube.com/live/viisNBr_KpU
 
-1. Updated Input controls
-    1. Arrows + tab
+~~1. Updated Input controls~~
+    ~~1. Arrows + tab~~
 
-### 3a. Get Inputs working
+### 3a. Get Inputs working (2023-08-15)
 
-1. Get the debugger working
-1. Position Validation
-1. Rendering of ships in correct location
+~~1. Get the debugger working~~
+~~1. Fix render bugs!~~
+~~1. Position Validation~~
+~~1. Rendering of ships in correct location~~
+~~1. Refator out the Player class~~
+~~1. Refator out the Game class~~
 
 ### 4. Game play (2023-08-22)
 
-1. Add Player(s)
+1. Add placement validation (don't allow ships to intersect)
 1. Add Game play mechanics
 
 ### 5+. Advanced Play

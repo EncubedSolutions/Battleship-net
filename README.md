@@ -23,20 +23,26 @@ You can follow the progress from start to finish of this project on my live stre
 1. ~~Refactor~~ 
     1. ~~Extract renderer~~
 
-### 3. Better inputs (2023-08-15)
+### 3. Better inputs (2023-08-15) https://www.youtube.com/live/viisNBr_KpU
 
 1. Updated Input controls
     1. Arrows + tab
-1. Add Player(s)
+
+### 3a. Get Inputs working
+
+1. Get the debugger working
+1. Position Validation
+1. Rendering of ships in correct location
 
 ### 4. Game play (2023-08-22)
 
+1. Add Player(s)
 1. Add Game play mechanics
 
 ### 5+. Advanced Play
 
 1. _Move ships_
-1. _Armours_
+1. _Armour_
 1. _Blast radius_
 1. _Different strength missiles_
 1. _Online_

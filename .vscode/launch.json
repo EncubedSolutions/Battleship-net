@@ -6,6 +6,7 @@
     "configurations": [
         {
             "name": ".NET Core Launch (console)",
+            "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/battleship-net/bin/Debug/net7.0/Battleship-net.dll",
@@ -17,6 +18,7 @@
         },
         {
             "name": ".NET Core Attach",
+            "type": "coreclr",
             "request": "attach"
         }
     ]

@@ -9,10 +9,10 @@ namespace battleship_net
             BoardHeight = boardHeight;
             BoardOffset = boardOffset;
 
-            Renderer = new Renderer(boardWidth, boardHeight, boardOffset);
+            Renderer = new Renderer(boardWidth, boardHeight, boardOffset, boardOffset with {X = boardOffset.X + 26});
             InputHandler = new InputHandler();
-            Player1 = new Player(this);
-            Player2 = new Player(this);
+            Player1 = new Player(this, "Mary");
+            Player2 = new Player(this, "Bob");
 
             Ships = new List<Ship>{
                 new Ship("Carrier", 5),
@@ -37,12 +37,21 @@ namespace battleship_net
 
         public void Play(){
             
-            Renderer.RenderBoard();
+            Renderer.RenderPlayerBoard();
             Player1.PlaceShips(Ships);
             Player2.PlaceShips(Ships);
 
-            //todo: Implement game play loop
+            var attacker = Player1;
+            var defender = Player2;
 
+            while(defender.IsAlive)
+            {
+                var target = attacker.GetTarget();
+                var didHit = defender.DidHit(target);
+                attacker.UpdateHits(target, didHit);
+            }
+
+            Renderer.RenderPrompt($"Player {attacker.Name} WON!!!!!");
         }
     }
 }

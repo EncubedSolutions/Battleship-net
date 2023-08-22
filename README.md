@@ -34,8 +34,8 @@ You can follow the progress from start to finish of this project on my live stre
 ~~1. Fix render bugs!~~
 ~~1. Position Validation~~
 ~~1. Rendering of ships in correct location~~
-~~1. Refator out the Player class~~
-~~1. Refator out the Game class~~
+~~1. Refactor out the Player class~~
+~~1. Refactor out the Game class~~
 
 ### 4. Game play (2023-08-22)
 

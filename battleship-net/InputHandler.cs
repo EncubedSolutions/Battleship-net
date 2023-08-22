@@ -35,8 +35,8 @@ namespace battleship_net {
             ConsoleKey.DownArrow => (InputCommand.MoveDown, null),
             ConsoleKey.LeftArrow => (InputCommand.MoveLeft, null),
             ConsoleKey.RightArrow => (InputCommand.MoveRight, null),
-            >= ConsoleKey.D0 and <= ConsoleKey.D9 => (InputCommand.SelectRow, key - ConsoleKey.A),
-            >= ConsoleKey.A and <= ConsoleKey.Z => (InputCommand.SelectCol, key - ConsoleKey.D0),
+            >= ConsoleKey.D0 and <= ConsoleKey.D9 => (InputCommand.SelectRow, key - ConsoleKey.D0),
+            >= ConsoleKey.A and <= ConsoleKey.Z => (InputCommand.SelectCol, key - ConsoleKey.A),
             _ => (InputCommand.NoOp, null)
         };
     }

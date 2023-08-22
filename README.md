@@ -39,8 +39,16 @@ You can follow the progress from start to finish of this project on my live stre
 
 ### 4. Game play (2023-08-22)
 
-1. Add placement validation (don't allow ships to intersect)
-1. Add Game play mechanics
+~~1. Recap last week (missing stream 😔)~~
+~~1. Add placement validation (don't allow ships to intersect)~~
+~~1. Start Game play mechanics~~
+
+### 4a. Game Play cont. (2023-08-29)
+
+1. Finish target cell render
+1. Handle user target input
+1. Add Titles to boards
+1. *Bonus*: Random Computer player
 
 ### 5+. Advanced Play
 
@@ -48,4 +56,5 @@ You can follow the progress from start to finish of this project on my live stre
 1. _Armour_
 1. _Blast radius_
 1. _Different strength missiles_
+1. _Torpedo's_
 1. _Online_

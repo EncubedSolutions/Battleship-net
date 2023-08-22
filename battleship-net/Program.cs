@@ -17,7 +17,7 @@ public class Program
 
 public record Coordinate(int X, int Y);
 public record Position(int Col, int Row, Orientation Orientation);
-public record Ship (string Name, int size);
+public record Ship (string Name, int Size);
 
 public enum Orientation { Horizontal, Vertical};
 

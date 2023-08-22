@@ -6,7 +6,7 @@ public class Player {
         private readonly Renderer _renderer;
         private readonly InputHandler _inputHandler;
 
-        List<(Ship, Position)> placed = new List<(Ship, Position)>();
+        List<(Ship, Position)> _placed = new List<(Ship, Position)>();
 
 
     public Player(Game game) {
@@ -16,28 +16,55 @@ public class Player {
         }
 
     public void PlaceShips(IEnumerable<Ship> ships) {
-        
-        foreach(var ship in ships) {
-            Position pos = new Position(0,0,Orientation.Vertical);
+
+            foreach (var ship in ships) PlaceShip(ship);
+        }
+
+        private void PlaceShip(Ship ship)
+        {
+            Position pos = new Position(0, 0, Orientation.Vertical);
             _renderer.RenderPrompt($"Please enter location for {ship.Name}: ");
-            _renderer.RefreshBoard(placed);
+            _renderer.RefreshBoard(_placed);
             _renderer.RenderShip(ship, pos);
-            //GetInput
-            while (true) {
+
+            while (true)
+            {
                 var (command, data) = _inputHandler.GetInput();
-                pos = GetPosition(pos, command, data, ship.size);
-                //Validate Pos
-                _renderer.RefreshBoard(placed);
-                _renderer.RenderShip(ship, pos);
-                if(command == InputCommand.Accept) {
-                    placed.Add(new (ship, pos));
+                pos = GetPosition(pos, command, data, ship.Size);
+                var canPlace = CanPlaceShip(ship, pos);
+                _renderer.RefreshBoard(_placed);
+                _renderer.RenderShip(ship, pos, canPlace);
+                if ((command == InputCommand.Accept) && canPlace)
+                {
+                    _placed.Add(new(ship, pos));
                     break;
                 }
             }
         }
-    }
 
-     private Position GetPosition(Position prev, InputCommand command, int? data, int shipSize)=>
+        private bool CanPlaceShip(Ship ship, Position pos)
+        {
+            var shipCells = GetCellsForShip(ship, pos);
+
+            var existing = _placed.SelectMany(item => GetCellsForShip(item.Item1,item.Item2));
+
+            var overlaps = existing.Intersect(shipCells);
+
+            return !overlaps.Any();
+        }
+
+        private IEnumerable<Coordinate> GetCellsForShip(Ship ship, Position pos)
+        {
+            if (pos.Orientation == Orientation.Horizontal){
+                var x = Enumerable.Range(pos.Col, ship.Size);
+                return x.Select(v => new Coordinate(v, pos.Row));
+            } else {
+                var y = Enumerable.Range(pos.Row, ship.Size);
+                return y.Select(v => new Coordinate(pos.Col, v));
+            }
+        }
+
+        private Position GetPosition(Position prev, InputCommand command, int? data, int shipSize)=>
      command switch{
               InputCommand.MoveUp => HandleMove(prev with { Row = prev.Row - 1}, shipSize),  
               InputCommand.MoveDown => HandleMove(prev with { Row = prev.Row + 1}, shipSize),

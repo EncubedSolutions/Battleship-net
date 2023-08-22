@@ -50,15 +50,15 @@ namespace battleship_net {
             Console.Write($"{rowNumber} |{row}|");
         }
 
-        public void RenderShip(Ship ship, Position position) 
+        public void RenderShip(Ship ship, Position position, bool isValid = true) 
         {
             var cellX = _boardOffset.X + colHeader + (position.Col *2);
             var cellY = _boardOffset.Y + position.Row;
 
-            Console.BackgroundColor = ConsoleColor.DarkGreen;
+            Console.BackgroundColor = isValid ? ConsoleColor.DarkGreen : ConsoleColor.DarkMagenta;
             Console.ForegroundColor = ConsoleColor.White;
 
-            for(int i= 0; i < ship.size; i++) {
+            for(int i= 0; i < ship.Size; i++) {
 
                 if (position.Orientation == Orientation.Vertical) {
                     Console.SetCursorPosition(cellX, cellY+i);

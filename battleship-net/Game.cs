@@ -2,7 +2,6 @@ namespace battleship_net
 {
     public class Game {
 
-        
         public Game(int boardWidth, int boardHeight, Coordinate boardOffset) {
 
             BoardWidth = boardWidth;
@@ -11,8 +10,7 @@ namespace battleship_net
 
             Renderer = new Renderer(boardWidth, boardHeight, boardOffset, boardOffset with {X = boardOffset.X + 26});
             InputHandler = new InputHandler();
-            Player1 = new Player(this, "Mary");
-            Player2 = new Player(this, "Bob");
+         
 
             Ships = new List<Ship>{
                 new Ship("Carrier", 5),
@@ -23,7 +21,6 @@ namespace battleship_net
             };
         }
 
-
         public int BoardWidth { get; }
         public int BoardHeight { get; }
         public Coordinate BoardOffset { get; }
@@ -31,27 +28,43 @@ namespace battleship_net
         public InputHandler InputHandler {get;}
 
         public IEnumerable<Ship> Ships {get;}
-        public Player Player1 {get;}
+        public Player Player1 {get; private set; }
 
-        public Player Player2 {get;}
+        public Player Player2 {get; private set;}
 
-        public void Play(){
+        public void Play(Player p1, Player p2) {
+            Player1 = p1;
+            Player2 = p2;
             
             Renderer.RenderPlayerBoard();
             Player1.PlaceShips(Ships);
+            Renderer.RenderPlayerBoard();
             Player2.PlaceShips(Ships);
 
             var attacker = Player1;
             var defender = Player2;
 
-            while(defender.IsAlive)
-            {
-                var target = attacker.GetTarget();
-                var didHit = defender.DidHit(target);
-                attacker.UpdateHits(target, didHit);
-            }
+            while (true){
+                Renderer.RefreshPlayerBoard(attacker);
+                Renderer.RefreshTargetBoard(attacker);
 
+               TakeTurn(attacker, defender);
+               if (!defender.IsAlive) {
+                break;
+               }
+               var temp = attacker;
+               attacker = defender;
+               defender = temp;
+            }
+            
             Renderer.RenderPrompt($"Player {attacker.Name} WON!!!!!");
+        }
+
+        private void TakeTurn(Player attacker, Player defender){
+
+            var target = attacker.GetTarget();
+            var didHit = defender.DidHit(target);
+            attacker.UpdateHits(target, didHit);
         }
     }
 }

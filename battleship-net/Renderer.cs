@@ -20,18 +20,18 @@ namespace battleship_net {
 
             Console.CursorVisible = false;
         }
-        public void RefreshPlayerBoard(IEnumerable<(Ship Ship, Position Pos)> ships ){
+        public void RefreshPlayerBoard(Player player){
             RenderPlayerBoard();
 
-            foreach(var ship in ships){
-                RenderShip(ship.Ship, ship.Pos);
+            foreach(var ship in player.Ships){
+                RenderShip(ship.Item1, ship.Item2);
             }
         }
 
-        public void RefreshTargetBoard(IEnumerable<(Coordinate, bool)> targets ){
+        public void RefreshTargetBoard(Player player){
             RenderTargetBoard();
 
-            foreach(var target in targets){
+            foreach(var target in player.Targets){
                 RenderTargetCell(target.Item1, target.Item2);
             }
         }
@@ -95,7 +95,7 @@ namespace battleship_net {
 
         private void RenderTargetCell(Coordinate coordinate, bool isHit) {
             //TODO: This doesn't work as expected
-            Console.SetCursorPosition(_targetBoardOffset.X + coordinate.X, _targetBoardOffset.Y + coordinate.Y);
+            Console.SetCursorPosition(_targetBoardOffset.X + (coordinate.X * 2)+ colHeader, _targetBoardOffset.Y + coordinate.Y);
 
             Console.BackgroundColor = isHit ? ConsoleColor.Red : ConsoleColor.Cyan;
             Console.Write('_');

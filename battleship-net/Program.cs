@@ -4,14 +4,14 @@ public class Program
 {
     private static void Main(string[] args)
     {
-
         var game = new Game(10,10,new Coordinate(0,3));
-        
+        var p1 = new HumanPlayer(game, "Bob");
+        var p2 = new ComputerPlayer(game, "Mary", 5);
         Console.Clear();
         Console.WriteLine("Hello, Battleship.net!");
         Console.WriteLine();
 
-        game.Play();
+        game.Play(p1,p2);
     }   
 }
 

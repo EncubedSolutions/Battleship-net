@@ -1,88 +1,63 @@
-
 namespace battleship_net {
 
-public class Player {
-        private readonly Game _game;
-        private readonly Renderer _renderer;
-        private readonly InputHandler _inputHandler;
+public abstract class Player {
+        protected Game Game {get;}
+        protected Renderer Renderer {get;}
+        protected InputHandler InputHandler {get;}
 
-        List<(Ship, Position)> _placed = new List<(Ship, Position)>();
-        List<(Coordinate, bool)> _shipCells = new List<(Coordinate, bool)>(); 
+        public List<(Ship, Position)> Ships {get; private set;} = new List<(Ship, Position)>();
+        public List<(Coordinate, bool)> Targets {get; private set;} = new List<(Coordinate, bool)>(); 
+        
+        protected Dictionary<Coordinate, bool> ShipCells {get; private set;} = new Dictionary<Coordinate, bool>();
 
-        List<(Coordinate, bool)> _targetCells = new List<(Coordinate, bool)>(); 
 
     public string Name {get;init;}
 
-    public bool IsAlive => _shipCells.Any(c => c.Item2 == false);
+    public bool IsAlive => ShipCells.Any(c => c.Value == false);
 
     public Player(Game game, string name) {
-            _game =game;
-            _renderer = game.Renderer;
-            _inputHandler = game.InputHandler;
+            Game =game;
+            Renderer = game.Renderer;
+            InputHandler = game.InputHandler;
             Name =name;
-
-            _targetCells.Add((new Coordinate(0, 2), false));
-            _targetCells.Add((new Coordinate(2, 2), true));
         }
 
-    public void PlaceShips(IEnumerable<Ship> ships) {
+    public abstract void PlaceShips(IEnumerable<Ship> ships);
 
-            foreach (var ship in ships) {
-                PlaceShip(ship);
-            }
-        }
-
-    public Coordinate GetTarget() {
-        _renderer.RefreshPlayerBoard(_placed);
-        _renderer.RefreshTargetBoard(_targetCells);
-        //TODO: Get cell from user
-        return new Coordinate(0,0);
-    }
+    public abstract Coordinate GetTarget();
     public bool DidHit(Coordinate coordinate){
-        var cells = _placed.SelectMany(s => GetCellsForShip(s.Item1, s.Item2));
-        return cells.Any(c => c == coordinate);
+        if (ShipCells.ContainsKey(coordinate)) {
+            ShipCells[coordinate] = true;
+            return true;
+        }
+        
+        return false;
     }
 
     public void UpdateHits(Coordinate coordinate, bool didHit){
-        _targetCells.Add((coordinate, didHit));
+        Targets.Add((coordinate, didHit));
     }
 
-        private void PlaceShip(Ship ship)
-        {
-            Position pos = new Position(0, 0, Orientation.Vertical);
-            _renderer.RenderPrompt($"Please enter location for {ship.Name}: ");
-            _renderer.RefreshPlayerBoard(_placed);
-            _renderer.RenderShip(ship, pos);
-
-            while (true)
-            {
-                var (command, data) = _inputHandler.GetInput();
-                pos = GetPosition(pos, command, data, ship.Size);
-                var canPlace = CanPlaceShip(ship, pos);
-                _renderer.RefreshPlayerBoard(_placed);
-                _renderer.RenderShip(ship, pos, canPlace);
-                if ((command == InputCommand.Accept) && canPlace)
-                {
-                    _placed.Add(new(ship, pos));
-                     var cells = GetCellsForShip(ship, pos);
-                    _shipCells.AddRange(cells.Select(c => (c, false)));
-                    break;
-                }
+        protected void AddShipPlacement(Ship ship, Position pos){
+            Ships.Add(new(ship, pos));
+            var cells = GetCellsForShip(ship, pos);
+            foreach(var c in cells){
+            ShipCells[c] = false;
             }
         }
 
-        private bool CanPlaceShip(Ship ship, Position pos)
+        protected bool CanPlaceShip(Ship ship, Position pos)
         {
             var shipCells = GetCellsForShip(ship, pos);
 
-            var existing = _placed.SelectMany(item => GetCellsForShip(item.Item1,item.Item2));
+            var existing = Ships.SelectMany(item => GetCellsForShip(item.Item1,item.Item2));
 
             var overlaps = existing.Intersect(shipCells);
 
             return !overlaps.Any();
         }
 
-        private IEnumerable<Coordinate> GetCellsForShip(Ship ship, Position pos)
+        protected IEnumerable<Coordinate> GetCellsForShip(Ship ship, Position pos)
         {
             if (pos.Orientation == Orientation.Horizontal){
                 var x = Enumerable.Range(pos.Col, ship.Size);
@@ -93,7 +68,63 @@ public class Player {
             }
         }
 
-        private Position GetPosition(Position prev, InputCommand command, int? data, int shipSize)=>
+       
+    }
+
+
+public class HumanPlayer : Player{
+    public HumanPlayer(Game game, string name) :
+     base(game, name)
+     {
+
+     }
+
+        public override void PlaceShips(IEnumerable<Ship> ships)
+        {
+            foreach (var ship in ships) {
+                PlaceShip(ship);
+            }
+        }
+        private void PlaceShip(Ship ship)
+        {
+            Position pos = new Position(0, 0, Orientation.Vertical);
+            Renderer.RenderPrompt($"Please enter location for {ship.Name}: ");
+            Renderer.RefreshPlayerBoard(this);
+            Renderer.RenderShip(ship, pos);
+
+            while (true)
+            {
+                var (command, data) = InputHandler.GetInput();
+                pos = GetPosition(pos, command, data, ship.Size);
+                var canPlace = CanPlaceShip(ship, pos);
+                Renderer.RefreshPlayerBoard(this);
+                Renderer.RenderShip(ship, pos, canPlace);
+                if ((command == InputCommand.Accept) && canPlace)
+                {
+                    AddShipPlacement(ship, pos);
+                    break;
+                }
+            }
+        }
+
+        public override Coordinate GetTarget()
+        {
+     
+        Renderer.RenderPrompt("Where are you Targetting?");
+
+        var pos = new Position(0,0,Orientation.Horizontal); 
+        while (true) {
+            var (command, data) = InputHandler.GetInput();
+            if  (command == InputCommand.Accept){
+                break;
+            }
+
+            pos = GetPosition(pos, command, data, 1);
+        }
+
+        return new Coordinate(pos.Col, pos.Row);
+    }
+     private Position GetPosition(Position prev, InputCommand command, int? data, int shipSize)=>
      command switch{
               InputCommand.MoveUp => HandleMove(prev with { Row = prev.Row - 1}, shipSize),  
               InputCommand.MoveDown => HandleMove(prev with { Row = prev.Row + 1}, shipSize),
@@ -106,10 +137,60 @@ public class Player {
             };
     
         private Position HandleMove(Position desired, int shipSize) {
-        var x = Math.Clamp(desired.Col, 0, _game.BoardWidth - (desired.Orientation == Orientation.Horizontal ? shipSize : 1));
-        var y = Math.Clamp(desired.Row, 0, _game.BoardHeight - (desired.Orientation == Orientation.Vertical ? shipSize : 1));
+        var x = Math.Clamp(desired.Col, 0, Game.BoardWidth - (desired.Orientation == Orientation.Horizontal ? shipSize : 1));
+        var y = Math.Clamp(desired.Row, 0, Game.BoardHeight - (desired.Orientation == Orientation.Vertical ? shipSize : 1));
 
         return desired with {Row = y, Col = x};
     }
+}
+
+public class ComputerPlayer : Player {
+
+    private readonly Random _rand;
+     public ComputerPlayer(Game game, string name, int seed) :
+     base(game, name)
+     {
+        _rand = new Random(seed);
+     }
+
+        public override void PlaceShips(IEnumerable<Ship> ships)
+        {
+            foreach(var ship in ships){
+                while (true) {
+                    var pos = GetRandomPos(ship.Size
+                    );
+                    if (CanPlaceShip(ship, pos)){
+                        AddShipPlacement(ship, pos);
+                        Renderer.RenderShip(ship, pos);
+                        Thread.Sleep(1000);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private Position GetRandomPos(int shipSize){
+            var x = _rand.Next(0, Game.BoardWidth);
+            var y = _rand.Next(0, Game.BoardHeight);
+            var o = (Orientation)_rand.Next(0,2);
+
+            x = Math.Clamp(x, 0, Game.BoardWidth - (o == Orientation.Horizontal ? shipSize : 1));
+            y = Math.Clamp(y, 0, Game.BoardHeight - (o == Orientation.Vertical ? shipSize : 1));
+            return new Position(x,y,o);
+        }
+
+        public override Coordinate GetTarget()
+        {
+            while (true){
+                var p = GetRandomPos(1);
+                var result = new Coordinate(p.Col, p.Row);
+
+                if (!Targets.Any(c => c.Item1 == result)) {
+                     Thread.Sleep(1000);
+                    return result;
+                }
+            }
+        }
     }
 }
+

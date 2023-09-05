@@ -1,0 +1,11 @@
+{
+    "Width": 10,
+    "Height" : 10,
+    "Ships": [
+        {"Name": "Carrier", "Size": 5},
+        {"Name": "Battleship", "Size": 4},
+        {"Name": "Destroyer", "Size": 3},
+        {"Name": "Submarine", "Size": 3},
+        {"Name": "Cruiser", "Size": 2}
+    ]
+}

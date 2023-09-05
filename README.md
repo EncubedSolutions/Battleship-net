@@ -50,22 +50,23 @@ You can follow the progress from start to finish of this project on my live stre
 ~~1. *Bonus*: Random Computer player~~
 
 ### 5. Tidy Up
-1. Add Titles to boards
+~~1. Add Titles to boards~~
+~~1. Target board doesn't have row header~~
+~~1. Tighten Player base class (principle of least privilage)~~
+~~1. ship placement, when placing second ship initially looks valid~~
+~~1. Game options class~~
+    ~~1. Load options from file~~
 1. Add target arrow navigation
-1. Target board doesnt have row header
-1. Tighten Player base class (principle of least privilage)
-1. ship placement, when placing second ship initially looks valid
-
-
 
 ### 5+. Advanced Play
 
-1. _Move ships_
 1. _Armour_
+1. _Move ships_
+1. _Mobile version: MAUI Renderer_
 1. _Advanced Missiles_
-    1. _Blast radius_
     1. _Different strength missiles_
+    1. _Blast radius_
     1. _Torpedo's_
     1. _Scout Plane_ 
-1. _Missle count_
+1. _Missle count per ship_
 1. _Online_

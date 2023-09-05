@@ -1,33 +1,23 @@
 namespace battleship_net 
 {
     public class Game {
+        private GameOptions _gameOptions;
+        public Game(GameOptions options, Coordinate boardOffset) {
 
-        public Game(int boardWidth, int boardHeight, Coordinate boardOffset) {
-
-            BoardWidth = boardWidth;
-            BoardHeight = boardHeight;
+            _gameOptions = options;
             BoardOffset = boardOffset;
 
-            Renderer = new Renderer(boardWidth, boardHeight, boardOffset, boardOffset with {X = boardOffset.X + 26});
+            Renderer = new Renderer(BoardWidth, BoardHeight, boardOffset);
             InputHandler = new InputHandler();
-         
-
-            Ships = new List<Ship>{
-                new Ship("Carrier", 5),
-                new Ship("Battleship", 4),
-                new Ship("Destroyer", 3),
-                new Ship("Submarine", 3),
-                new Ship("Cruiser", 2),
-            };
         }
 
-        public int BoardWidth { get; }
-        public int BoardHeight { get; }
+        public int BoardWidth => _gameOptions.Width;
+        public int BoardHeight => _gameOptions.Height;
         public Coordinate BoardOffset { get; }
         public Renderer Renderer {get;}
         public InputHandler InputHandler {get;}
 
-        public IEnumerable<Ship> Ships {get;}
+        public IEnumerable<Ship> Ships =>_gameOptions.Ships;
         public Player Player1 {get; private set; }
 
         public Player Player2 {get; private set;}
@@ -36,9 +26,9 @@ namespace battleship_net
             Player1 = p1;
             Player2 = p2;
             
-            Renderer.RenderPlayerBoard();
+            Renderer.RenderPlayerBoard(Player1);
             Player1.PlaceShips(Ships);
-            Renderer.RenderPlayerBoard();
+            Renderer.RenderPlayerBoard(Player2);
             Player2.PlaceShips(Ships);
 
             var attacker = Player1;

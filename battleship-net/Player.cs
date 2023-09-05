@@ -5,11 +5,14 @@ public abstract class Player {
         protected Renderer Renderer {get;}
         protected InputHandler InputHandler {get;}
 
-        public List<(Ship, Position)> Ships {get; private set;} = new List<(Ship, Position)>();
-        public List<(Coordinate, bool)> Targets {get; private set;} = new List<(Coordinate, bool)>(); 
+        public IReadOnlyList<(Ship, Position)> Ships => _ships;
+        public IReadOnlyList<(Coordinate, bool)> Targets => _targets; 
+        protected IReadOnlyDictionary<Coordinate, bool> ShipCells => _shipCells;
         
-        protected Dictionary<Coordinate, bool> ShipCells {get; private set;} = new Dictionary<Coordinate, bool>();
+        private Dictionary<Coordinate, bool> _shipCells = new Dictionary<Coordinate, bool>();
 
+        private List<(Ship, Position)> _ships = new List<(Ship, Position)>();
+        private List<(Coordinate, bool)> _targets = new List<(Coordinate, bool)>();
 
     public string Name {get;init;}
 
@@ -26,8 +29,8 @@ public abstract class Player {
 
     public abstract Coordinate GetTarget();
     public bool DidHit(Coordinate coordinate){
-        if (ShipCells.ContainsKey(coordinate)) {
-            ShipCells[coordinate] = true;
+        if (_shipCells.ContainsKey(coordinate)) {
+            _shipCells[coordinate] = true;
             return true;
         }
         
@@ -35,42 +38,39 @@ public abstract class Player {
     }
 
     public void UpdateHits(Coordinate coordinate, bool didHit){
-        Targets.Add((coordinate, didHit));
+        _targets.Add((coordinate, didHit));
     }
 
-        protected void AddShipPlacement(Ship ship, Position pos){
-            Ships.Add(new(ship, pos));
-            var cells = GetCellsForShip(ship, pos);
-            foreach(var c in cells){
-            ShipCells[c] = false;
-            }
+    protected void AddShipPlacement(Ship ship, Position pos){
+        _ships.Add(new(ship, pos));
+        var cells = GetCellsForShip(ship, pos);
+        foreach(var c in cells){
+         _shipCells[c] = false;
         }
-
-        protected bool CanPlaceShip(Ship ship, Position pos)
-        {
-            var shipCells = GetCellsForShip(ship, pos);
-
-            var existing = Ships.SelectMany(item => GetCellsForShip(item.Item1,item.Item2));
-
-            var overlaps = existing.Intersect(shipCells);
-
-            return !overlaps.Any();
-        }
-
-        protected IEnumerable<Coordinate> GetCellsForShip(Ship ship, Position pos)
-        {
-            if (pos.Orientation == Orientation.Horizontal){
-                var x = Enumerable.Range(pos.Col, ship.Size);
-                return x.Select(v => new Coordinate(v, pos.Row));
-            } else {
-                var y = Enumerable.Range(pos.Row, ship.Size);
-                return y.Select(v => new Coordinate(pos.Col, v));
-            }
-        }
-
-       
     }
 
+    protected bool CanPlaceShip(Ship ship, Position pos)
+    {
+        var shipCells = GetCellsForShip(ship, pos);
+
+        var existing = Ships.SelectMany(item => GetCellsForShip(item.Item1,item.Item2));
+
+        var overlaps = existing.Intersect(shipCells);
+
+        return !overlaps.Any();
+    }
+
+    protected IEnumerable<Coordinate> GetCellsForShip(Ship ship, Position pos)
+    {
+        if (pos.Orientation == Orientation.Horizontal){
+            var x = Enumerable.Range(pos.Col, ship.Size);
+            return x.Select(v => new Coordinate(v, pos.Row));
+        } else {
+            var y = Enumerable.Range(pos.Row, ship.Size);
+            return y.Select(v => new Coordinate(pos.Col, v));
+        }
+    }
+}
 
 public class HumanPlayer : Player{
     public HumanPlayer(Game game, string name) :
@@ -78,7 +78,6 @@ public class HumanPlayer : Player{
      {
 
      }
-
         public override void PlaceShips(IEnumerable<Ship> ships)
         {
             foreach (var ship in ships) {
@@ -90,7 +89,8 @@ public class HumanPlayer : Player{
             Position pos = new Position(0, 0, Orientation.Vertical);
             Renderer.RenderPrompt($"Please enter location for {ship.Name}: ");
             Renderer.RefreshPlayerBoard(this);
-            Renderer.RenderShip(ship, pos);
+            var initCanPlace = CanPlaceShip(ship, pos);
+            Renderer.RenderShip(ship, pos,initCanPlace);
 
             while (true)
             {
